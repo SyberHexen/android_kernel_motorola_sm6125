@@ -3,6 +3,7 @@
  * FocalTech fts TouchScreen driver.
  *
  * Copyright (c) 2012-2019, Focaltech Ltd. All rights reserved.
+ * Copyright (C) 2020 XiaoMi, Inc.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -36,12 +37,12 @@
 /*****************************************************************************
 * Macro definitions using #define
 *****************************************************************************/
-#define FTS_DRIVER_VERSION                  "Focaltech V3.1 20190420"
+#define FTS_DRIVER_VERSION                  "Focaltech V3.1 20190807"
 
 #define BYTE_OFF_0(x)           (u8)((x) & 0xFF)
-#define BYTE_OFF_8(x)           (u8)((x >> 8) & 0xFF)
-#define BYTE_OFF_16(x)          (u8)((x >> 16) & 0xFF)
-#define BYTE_OFF_24(x)          (u8)((x >> 24) & 0xFF)
+#define BYTE_OFF_8(x)           (u8)(((x) >> 8) & 0xFF)
+#define BYTE_OFF_16(x)          (u8)(((x) >> 16) & 0xFF)
+#define BYTE_OFF_24(x)          (u8)(((x) >> 24) & 0xFF)
 #define FLAGBIT(x)              (0x00000001 << (x))
 #define FLAGBITS(x, y)          ((0xFFFFFFFF >> (32 - (y) - 1)) & (0xFFFFFFFF << (x)))
 
@@ -54,15 +55,7 @@
 #define FTS_CHIP_IDC            ((FTS_CHIP_TYPE & FLAGBIT(FLAG_IDC_BIT)) == FLAGBIT(FLAG_IDC_BIT))
 #define FTS_HID_SUPPORTTED      ((FTS_CHIP_TYPE & FLAGBIT(FLAG_HID_BIT)) == FLAGBIT(FLAG_HID_BIT))
 
-#if defined(CONFIG_INPUT_FOCALTECH_0FLASH_MMI_IC_NAME_FT8756)
 #define FTS_CHIP_TYPE_MAPPING {{0x15, 0x87, 0x56, 0x87, 0x56, 0xF7, 0xA6, 0x00, 0x00}}
-#elif defined(CONFIG_INPUT_FOCALTECH_0FLASH_MMI_IC_NAME_FT8719)
-#define FTS_CHIP_TYPE_MAPPING {{0x0D,0x87, 0x19, 0x87, 0x19, 0x87, 0xA9, 0x87, 0xB9}}
-#elif defined(CONFIG_INPUT_FOCALTECH_0FLASH_MMI_IC_NAME_FT8009)
-#define FTS_CHIP_TYPE_MAPPING {{0x17, 0x80, 0x09, 0x80, 0x09, 0x80, 0xA9, 0x00, 0x00}}
-#else
-#define FTS_CHIP_TYPE_MAPPING {{0x0D,0x87, 0x19, 0x87, 0x19, 0x87, 0xA9, 0x87, 0xB9}}
-#endif
 
 #define FILE_NAME_LENGTH                    128
 #define ENABLE                              1
@@ -71,7 +64,7 @@
 #define INVALID                             0
 #define FTS_CMD_START1                      0x55
 #define FTS_CMD_START2                      0xAA
-#define FTS_CMD_START_DELAY                 10
+#define FTS_CMD_START_DELAY                 12
 #define FTS_CMD_READ_ID                     0x90
 #define FTS_CMD_READ_ID_LEN                 4
 #define FTS_CMD_READ_ID_LEN_INCELL          1
@@ -85,7 +78,7 @@
 #define FTS_REG_CHIP_ID                     0xA3
 #define FTS_REG_CHIP_ID2                    0x9F
 #define FTS_REG_POWER_MODE                  0xA5
-#define FTS_REG_POWER_MODE_SLEEP_VALUE      0x03
+#define FTS_REG_POWER_MODE_SLEEP            0x03
 #define FTS_REG_FW_VER                      0xA6
 #define FTS_REG_VENDOR_ID                   0xA8
 #define FTS_REG_LCD_BUSY_NUM                0xAB
@@ -96,7 +89,6 @@
 #define FTS_REG_IDE_PARA_STATUS             0xB6
 #define FTS_REG_GLOVE_MODE_EN               0xC0
 #define FTS_REG_COVER_MODE_EN               0xC1
-#define FTS_REG_PEN_DETECTION               0xC2
 #define FTS_REG_CHARGER_MODE_EN             0x8B
 #define FTS_REG_GESTURE_EN                  0xD0
 #define FTS_REG_GESTURE_OUTPUT_ADDRESS      0xD3
@@ -121,27 +113,27 @@
  * point report check
  * default: disable
  */
-#define FTS_POINT_REPORT_CHECK_EN               1
+#define FTS_POINT_REPORT_CHECK_EN               0
 
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
 struct ft_chip_t {
-    u64 type;
-    u8 chip_idh;
-    u8 chip_idl;
-    u8 rom_idh;
-    u8 rom_idl;
-    u8 pb_idh;
-    u8 pb_idl;
-    u8 bl_idh;
-    u8 bl_idl;
+	u64 type;
+	u8 chip_idh;
+	u8 chip_idl;
+	u8 rom_idh;
+	u8 rom_idl;
+	u8 pb_idh;
+	u8 pb_idl;
+	u8 bl_idh;
+	u8 bl_idl;
 };
 
 struct ts_ic_info {
-    bool is_incell;
-    bool hid_supported;
-    struct ft_chip_t ids;
+	bool is_incell;
+	bool hid_supported;
+	struct ft_chip_t ids;
 };
 
 /*****************************************************************************
@@ -159,18 +151,10 @@ struct ts_ic_info {
 #define FTS_FUNC_EXIT() do { \
     printk("[FTS_TS]%s: Exit(%d)\n", __func__, __LINE__); \
 } while (0)
-#else /* #if FTS_DEBUG_EN*/
-#define FTS_DEBUG(fmt, args...) do { \
-    pr_debug("[FTS_TS]%s:"fmt"\n", __func__, ##args); \
-} while (0)
-
-#define FTS_FUNC_ENTER() do { \
-    pr_debug("[FTS_TS]%s: Enter\n", __func__); \
-} while (0)
-
-#define FTS_FUNC_EXIT() do { \
-    pr_debug("[FTS_TS]%s: Exit(%d)\n", __func__, __LINE__); \
-} while (0)
+#else /* #if FTS_DEBUG_EN */
+#define FTS_DEBUG(fmt, args...)
+#define FTS_FUNC_ENTER()
+#define FTS_FUNC_EXIT()
 #endif
 
 #define FTS_INFO(fmt, args...) do { \

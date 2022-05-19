@@ -68,13 +68,11 @@
 #define FTS_DELAY_UPGRADE_RESET                     80
 #define PRAMBOOT_MIN_SIZE                           0x120
 #define PRAMBOOT_MAX_SIZE                           (64*1024)
-#define FTS_FLASH_PACKET_LENGTH                     32     /* max=128 */
-#define FTS_MAX_LEN_ECC_CALC                        0xFFFE /* must be even */
+#define FTS_FLASH_PACKET_LENGTH                     32	/* max=128 */
+#define FTS_MAX_LEN_ECC_CALC                        0xFFFE	/* must be even */
 #define FTS_MIN_LEN                                 0x120
 #define FTS_MAX_LEN_FILE                            (128 * 1024)
-#define FTS_MAX_LEN_APP_FT8756                      (88 * 1024)
 #define FTS_MAX_LEN_APP                             (64 * 1024)
-#define FTS_MAX_LEN_APP_PARAMS                      (32 * 1024)
 #define FTS_MAX_LEN_SECTOR                          (4 * 1024)
 #define FTS_CONIFG_VENDORID_OFF                     0x04
 #define FTS_CONIFG_MODULEID_OFF                     0x1E
@@ -105,23 +103,23 @@
 #define FTS_APP_INFO_OFFSET                         0x100
 
 enum FW_STATUS {
-    FTS_RUN_IN_ERROR,
-    FTS_RUN_IN_APP,
-    FTS_RUN_IN_ROM,
-    FTS_RUN_IN_PRAM,
-    FTS_RUN_IN_BOOTLOADER,
+	FTS_RUN_IN_ERROR,
+	FTS_RUN_IN_APP,
+	FTS_RUN_IN_ROM,
+	FTS_RUN_IN_PRAM,
+	FTS_RUN_IN_BOOTLOADER,
 };
 
 enum FW_FLASH_MODE {
-    FLASH_MODE_APP,
-    FLASH_MODE_LIC,
-    FLASH_MODE_PARAM,
-    FLASH_MODE_ALL,
+	FLASH_MODE_APP,
+	FLASH_MODE_LIC,
+	FLASH_MODE_PARAM,
+	FLASH_MODE_ALL,
 };
 
 enum ECC_CHECK_MODE {
-    ECC_CHECK_MODE_XOR,
-    ECC_CHECK_MODE_CRC16,
+	ECC_CHECK_MODE_XOR,
+	ECC_CHECK_MODE_CRC16,
 };
 
 /*****************************************************************************
@@ -129,56 +127,70 @@ enum ECC_CHECK_MODE {
 *****************************************************************************/
 /* IC info */
 struct upgrade_func {
-    u64 ctype[FTX_MAX_COMPATIBLE_TYPE];
-    u32 fwveroff;
-    u32 fwcfgoff;
-    u32 appoff;
-    u32 licoff;
-    u32 paramcfgoff;
-    u32 paramcfgveroff;
-    u32 paramcfg2off;
-    int pram_ecc_check_mode;
-    int fw_ecc_check_mode;
-    bool new_return_value_from_ic;
-    bool appoff_handle_in_ic;
-    bool is_reset_register_BC;
-    bool read_boot_id_need_reset;
-    bool hid_supported;
-    bool pramboot_supported;
-    u8 *pramboot;
-    u32 pb_length;
-    int (*init)(u8 *, u32);
-    int (*upgrade)(u8 *, u32);
-    int (*get_hlic_ver)(u8 *);
-    int (*lic_upgrade)(u8 *, u32);
-    int (*param_upgrade)(u8 *, u32);
-    int (*force_upgrade)(u8 *, u32);
+	u64 ctype[FTX_MAX_COMPATIBLE_TYPE];
+	u32 fwveroff;
+	u32 fwcfgoff;
+	u32 appoff;
+	u32 licoff;
+	u32 paramcfgoff;
+	u32 paramcfgveroff;
+	u32 paramcfg2off;
+	int pram_ecc_check_mode;
+	int fw_ecc_check_mode;
+	bool new_return_value_from_ic;
+	bool appoff_handle_in_ic;
+	bool is_reset_register_BC;
+	bool read_boot_id_need_reset;
+	bool hid_supported;
+	bool pramboot_supported;
+	u8 *pramboot;
+	u32 pb_length;
+	int (*init) (u8 *, u32);
+	int (*upgrade) (u8 *, u32);
+	int (*get_hlic_ver) (u8 *);
+	int (*lic_upgrade) (u8 *, u32);
+	int (*param_upgrade) (u8 *, u32);
+	int (*force_upgrade) (u8 *, u32);
+};
+
+struct upgrade_setting_nf {
+	u8 rom_idh;
+	u8 rom_idl;
+	u16 reserved;
+	u32 app2_offset;
+	u32 ecclen_max;
+	u8 eccok_val;
+	u8 upgsts_boot;
+	u8 delay_init;
+	bool spi_pe;
+	bool half_length;
+	bool fd_check;
+	bool drwr_support;
 };
 
 struct upgrade_module {
-    int id;
-    char vendor_name[MAX_MODULE_VENDOR_NAME_LEN];
-    u8 *fw_file;
-    u32 fw_len;
+	int id;
+	char vendor_name[MAX_MODULE_VENDOR_NAME_LEN];
+	u8 *fw_file;
+	u32 fw_len;
 };
 
 struct fts_upgrade {
-    struct fts_ts_data *ts_data;
-    struct upgrade_module *module_info;
-    struct upgrade_func *func;
-    int module_id;
-    bool fw_from_request;
-    u8 *fw;
-    u32 fw_length;
-    u8 *lic;
-    u32 lic_length;
+	struct fts_ts_data *ts_data;
+	struct upgrade_module *module_info;
+	struct upgrade_func *func;
+	struct upgrade_setting_nf *setting_nf;
+	int module_id;
+	bool fw_from_request;
+	u8 *fw;
+	u32 fw_length;
+	u8 *lic;
+	u32 lic_length;
 };
 
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-int fts_check_bootid(void);
-int fts_fw_write_start(const u8 *buf, u32 len, bool need_reset);
 
 /*****************************************************************************
 * Static function prototypes

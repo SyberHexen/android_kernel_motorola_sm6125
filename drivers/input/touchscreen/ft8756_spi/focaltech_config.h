@@ -3,6 +3,7 @@
  * FocalTech TouchScreen driver.
  *
  * Copyright (c) 2012-2019, FocalTech Systems, Ltd., all rights reserved.
+ * Copyright (C) 2020 XiaoMi, Inc.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -36,7 +37,6 @@
 #define _FT8716             0x87160805
 #define _FT8736             0x87360806
 #define _FT8006M            0x80060807
-#define _FT7250             0x72500807
 #define _FT8607             0x86070809
 #define _FT8006U            0x8006D80B
 #define _FT8006S            0x8006A80B
@@ -53,6 +53,8 @@
 #define _FT8302             0x83020816
 #define _FT8009             0x80090817
 #define _FT8656             0x86560818
+#define _FT8006S_AA         0x86320819
+#define _FT7250             0x7250081A
 
 #define _FT5416             0x54160402
 #define _FT5426             0x54260402
@@ -125,19 +127,7 @@
 /*
  * choose your ic chip type of focaltech
  */
-#if defined(CONFIG_INPUT_FOCALTECH_0FLASH_MMI_IC_NAME_FT8756)
 #define FTS_CHIP_TYPE   _FT8756
-#define FTS_CHIP_NAME   "ft8756"
-#elif defined(CONFIG_INPUT_FOCALTECH_0FLASH_MMI_IC_NAME_FT8719)
-#define FTS_CHIP_TYPE   _FT8719
-#define FTS_CHIP_NAME   "ft8719"
-#elif defined(CONFIG_INPUT_FOCALTECH_0FLASH_MMI_IC_NAME_FT8009)
-#define FTS_CHIP_TYPE   _FT8009
-#define FTS_CHIP_NAME   "ft8009"
-#else
-#define FTS_CHIP_TYPE   _FT8719
-#define FTS_CHIP_NAME   "ft8719"
-#endif
 
 /******************* Enables *********************/
 /*********** 1 to enable, 0 to disable ***********/
@@ -164,11 +154,7 @@
  * Gesture function enable
  * default: disable
  */
-#ifdef FOCALTECH_SENSOR_EN
-#define FTS_GESTURE_EN                          1
-#else
 #define FTS_GESTURE_EN                          0
-#endif
 
 /*
  * ESD check & protection
@@ -180,13 +166,7 @@
  * Production test enable
  * 1: enable, 0:disable(default)
  */
-#define FTS_TEST_EN                             0
-
-/*
- * Nodes for tools, please keep enable
- */
-#define FTS_SYSFS_NODE_EN                       1
-#define FTS_APK_NODE_EN                         1
+#define FTS_TEST_EN                             1
 
 /*
  * Pinctrl enable
@@ -207,7 +187,7 @@
 /*
  * auto upgrade
  */
-#define FTS_AUTO_UPGRADE_EN                     0
+#define FTS_AUTO_UPGRADE_EN                     1
 
 /*
  * auto upgrade for lcd cfg
@@ -218,11 +198,6 @@
  * Numbers of modules support
  */
 #define FTS_GET_MODULE_NUM                      0
-
-/*
- * Usb detect support
- */
-#define FTS_USB_DETECT_EN                       1
 
 /*
  * module_id: mean vendor_id generally, also maybe gpio or lcm_id...
@@ -243,7 +218,7 @@
  * You should rename fw to "focaltech_ts_fw_tianma", and push it into
  * etc/firmware or by customers
  */
-#define FTS_MODULE_NAME                        ""
+#define FTS_MODULE_NAME                        "tianma"
 #define FTS_MODULE2_NAME                       ""
 #define FTS_MODULE3_NAME                       ""
 
@@ -251,21 +226,20 @@
  * FW.i file for auto upgrade, you must replace it with your own
  * define your own fw_file, the sample one to be replaced is invalid
  * NOTE: if FTS_GET_MODULE_NUM > 1, it's the fw corresponding with FTS_VENDOR_ID
- * NOTE: git may ignore xxx.i file
  */
-#define FTS_UPGRADE_FW_FILE                      "include/firmware/fw_sample.i"
+#define FTS_UPGRADE_FW_FILE                      "include/firmware/fw_tianma.i"
 
 /*
  * if FTS_GET_MODULE_NUM >= 2, fw corrsponding with FTS_VENDOR_ID2
  * define your own fw_file, the sample one is invalid
  */
-#define FTS_UPGRADE_FW2_FILE                     "include/firmware/fw_sample.h"
+#define FTS_UPGRADE_FW2_FILE                     "include/firmware/fw_sample.i"
 
 /*
  * if FTS_GET_MODULE_NUM >= 3, fw corrsponding with FTS_VENDOR_ID3
  * define your own fw_file, the sample one is invalid
  */
-#define FTS_UPGRADE_FW3_FILE                     "include/firmware/fw_sample.h"
+#define FTS_UPGRADE_FW3_FILE                     "include/firmware/fw_sample.i"
 
 /*********************************************************/
 
